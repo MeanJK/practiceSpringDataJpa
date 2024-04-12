@@ -83,4 +83,29 @@ class MemberJpaRepositoryTest {
 
         assertThat(findMember.get(0)).isEqualTo(member1);
     }
+
+    @Test
+    public void testPaging(){
+        //given
+        memberJpaRepository.save(new Member("aaa", 10));
+        memberJpaRepository.save(new Member("bbb", 10));
+        memberJpaRepository.save(new Member("ccc", 10));
+        memberJpaRepository.save(new Member("ddd", 10));
+        memberJpaRepository.save(new Member("eee", 10));
+        //when
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+        long totalCount = memberJpaRepository.totalCount(age);
+
+        //페이지 계산 공식
+        //totalPage = totalCount / size ...
+        //마지막 페이지 ...
+        //최종 페이지 ...
+
+        //then
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(totalCount).isEqualTo(5);
+    }
 }

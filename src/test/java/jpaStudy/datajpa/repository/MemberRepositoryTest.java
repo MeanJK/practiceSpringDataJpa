@@ -101,4 +101,22 @@ class MemberRepositoryTest {
         assertThat(names.get(0)).isEqualTo(member1);
         assertThat(names.get(1)).isEqualTo(member2);
     }
+
+    @Test
+    public void testResultType(){
+        Member member1 = new Member("cham", 15);
+        Member member2 = new Member("chambi", 15);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> findMembers = memberRepository.findListByUsername("casasdfsdf");
+        System.out.println("findMembers = " + findMembers); //컬렉션은 빈 값이라도 0을 반환
+
+        Member findMember1 = memberRepository.findMemberByUsername("asdfasfasd");
+        System.out.println("findMember1 = " + findMember1);  //null 반환
+
+        Optional<Member> findMember2 = memberRepository.findOptionalMemberByUsername("asdfasdfasdf");
+        System.out.println("findMember2 = " + findMember2); //Optional.empty반환
+    }
 }
