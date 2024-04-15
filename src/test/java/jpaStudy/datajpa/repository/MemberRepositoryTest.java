@@ -1,5 +1,7 @@
 package jpaStudy.datajpa.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jpaStudy.datajpa.dto.MemberDto;
 import jpaStudy.datajpa.entity.Member;
 import jpaStudy.datajpa.entity.Team;
@@ -24,6 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void testMember(){
@@ -133,10 +138,11 @@ class MemberRepositoryTest {
         int age = 10;
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
 
-
+//        memberRepository.findTop3ByAge(age) 맨 앞에 3건만 가져오고 싶다면 페이징 넘기지 말고 다음과 같이 하자!
         Page<Member> pages = memberRepository.findByAge(age, pageRequest);
 
-        //Member 엔티티 상태로 반환하면 좋지 않다고 전부터 누누히 말했다. Dto로 변환시켜 반환하기!
+        //Member 엔티티를 외부에 반환하면 좋지 않다고 전부터 누누히 말했다. Dto로 변환시켜 반환하자.
+        //엔티티를 외부에 노출시키면 API 스펙이 바뀌어버리기 때문에 에러가 발생할 가능성이 상당히 높다.
         Page<MemberDto> toMap = pages.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
 
         List<Member> content = pages.getContent();
@@ -148,5 +154,26 @@ class MemberRepositoryTest {
         assertThat(pages.getTotalPages()).isEqualTo(2);
         assertThat(pages.isFirst()).isTrue();
         assertThat(pages.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate(){
+
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 15));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 22));
+        memberRepository.save(new Member("member5", 25));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        List<Member> result = memberRepository.findByUsername("member5");
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5);
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
     }
 }
