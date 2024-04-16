@@ -4,6 +4,7 @@ import jpaStudy.datajpa.dto.MemberDto;
 import jpaStudy.datajpa.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +43,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Modifying(clearAutomatically = true)  //업데이는 해당 어노테이션이 들어가야한다, clearAutomatically = true를 해주면 em.clear를 자동으로 해준다.
     @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
+
+    @Query("select m from Member m left join fetch m.team")
+    List<Member> findMemberFetchJoin();  //fetch조인을 사용하여 proxy가짜 객체가 아닌 진짜 Team 객체 리턴
+
+    @Override
+    @EntityGraph(attributePaths = {"team"}) //Entity그래프를 이용해 쿼리 작성을 안해도 Member와 연관관계가 있는 모든 것을 한 번에 리턴
+    List<Member> findAll();
 }
