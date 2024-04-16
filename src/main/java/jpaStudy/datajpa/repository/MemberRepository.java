@@ -1,13 +1,11 @@
 package jpaStudy.datajpa.repository;
 
+import jakarta.persistence.QueryHint;
 import jpaStudy.datajpa.dto.MemberDto;
 import jpaStudy.datajpa.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
@@ -50,4 +48,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Override
     @EntityGraph(attributePaths = {"team"}) //Entity그래프를 이용해 쿼리 작성을 안해도 Member와 연관관계가 있는 모든 것을 한 번에 리턴
     List<Member> findAll();
+
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findOnlyByUsername(String username);
+
 }

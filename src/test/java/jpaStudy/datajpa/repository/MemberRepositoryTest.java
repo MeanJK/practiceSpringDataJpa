@@ -206,4 +206,18 @@ class MemberRepositoryTest {
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
         }
     }
+    
+    @Test
+    void 쿼리_힌트_테스트() throws Exception {
+        //given
+        Member member = new Member("min", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+        //when
+        Member member1 = memberRepository.findOnlyByUsername("min");
+        member1.setUsername("min2");
+        em.flush();
+        //then
+    }
 }
